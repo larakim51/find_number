@@ -23,6 +23,8 @@ public class Main {
             homeView.setVisible(true);
         } else {
             // Đăng ký không thành công, không được thoát ứng dụng
+            //palm de thwnmdfjksf
+            System.out.println("Hello Git Hub test");
         }
     }
 }
