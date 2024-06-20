@@ -37,7 +37,8 @@ public class GameView extends JFrame {
         numberButtons = new JButton[100];
         for (int i = 0; i < 100; i++) {
             numberButtons[i] = new JButton(String.valueOf(i + 1));
-            numberButtons[i].addActionListener(e -> handleNumberClick(Integer.parseInt(((JButton) e.getSource()).getText())));
+            numberButtons[i]
+                    .addActionListener(e -> handleNumberClick(Integer.parseInt(((JButton) e.getSource()).getText())));
             panel.add(numberButtons[i]);
         }
 

@@ -110,17 +110,18 @@ public class RegisterView extends JFrame {
             }
         }
     }
-        public Player waitForRegistration() {
-            registrationFuture = new CompletableFuture<>();
-            return registrationFuture.join();
-        }
-    
-        public static void main(String[] args) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    new RegisterView().setVisible(true);
-                }
-            });
-        }
+
+    public Player waitForRegistration() {
+        registrationFuture = new CompletableFuture<>();
+        return registrationFuture.join();
     }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new RegisterView().setVisible(true);
+            }
+        });
+    }
+}

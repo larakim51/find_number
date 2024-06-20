@@ -99,15 +99,15 @@ public class LoginView extends JFrame {
                 JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
                 Player player = new Player(username, password);
                 dispose();
-                
+
                 SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    GameSession gameSession = new GameSession();
-                    gameSession.addPlayer(player);
-                    new HomeView(gameSession).setVisible(true);
-                }
-            });
+                    @Override
+                    public void run() {
+                        GameSession gameSession = new GameSession();
+                        gameSession.addPlayer(player);
+                        new HomeView(gameSession).setVisible(true);
+                    }
+                });
             } else {
                 JOptionPane.showMessageDialog(this, "Tên đăng nhập hoặc mật khẩu không đúng!");
             }
@@ -125,4 +125,4 @@ public class LoginView extends JFrame {
             }
         });
     }
-} 
+}
