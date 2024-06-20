@@ -9,9 +9,12 @@ import java.awt.event.ActionListener;
 
 public class HomeView extends JFrame {
     private GameSession gameSession;
+    private static HomeView instance;
 
     public HomeView(GameSession gameSession) {
         this.gameSession = gameSession;
+        instance = this; // Gán instance khi khởi tạo HomeView
+
         setTitle("Number Finding Game");
         setSize(400, 300);
         setLocationRelativeTo(null);
@@ -19,6 +22,12 @@ public class HomeView extends JFrame {
         initUI();
     }
 
+    public static void showHomeView() { // Phương thức static để hiển thị HomeView
+        if (instance != null) {
+            instance.setVisible(true);
+            instance.toFront(); // Đưa HomeView lên trên cùng
+        }
+    }
     private void initUI() {
         JPanel panel = new JPanel(new GridLayout(4, 1, 20, 20));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -66,7 +75,7 @@ public class HomeView extends JFrame {
     private void startSinglePlayerGame() {
         // Khởi động chế độ chơi 1 người
         dispose();
-        new GameView(gameSession).setVisible(true);
+        new GameView(this,gameSession).setVisible(true);
     }
 
     private void startMultiPlayerGame() {
