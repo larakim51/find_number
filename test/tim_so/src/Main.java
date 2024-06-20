@@ -1,19 +1,18 @@
 import model.GameSession;
 import model.Player;
 import view.HomeView;
-import view.RegisterView;
+import view.LoginView;
 
 public class Main {
     public static void main(String[] args) {
         // Khởi tạo model, view và controller
         GameSession gameSession = new GameSession();
 
-        // Hiện màn hình đăng ký
-        RegisterView registerView = new RegisterView();
-        registerView.setVisible(true);
+        LoginView loginView = new LoginView();
+        loginView.setVisible(true);
 
         // Chờ đăng ký thành công
-        Player player = registerView.waitForRegistration();
+        Player player = loginView.waitForRegistration();
         if (player != null) {
             // Thêm người chơi vào model
             gameSession.addPlayer(player);
@@ -23,7 +22,11 @@ public class Main {
             homeView.setVisible(true);
         } else {
             // Đăng ký không thành công, không được thoát ứng dụng
-            System.out.println("Đăng ký không thành công!!");
         }
+
+        /*
+         * HomeView homeView = new HomeView(gameSession);
+         * homeView.setVisible(true);
+         */
     }
 }
