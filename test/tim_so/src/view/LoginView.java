@@ -21,8 +21,9 @@ public class LoginView extends JFrame {
     private JButton registerButton;
     private CompletableFuture<Player> registrationFuture;
 
+
     public LoginView() {
-        setUndecorated(true);
+        setUndecorated(true); 
         setSize(500, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -30,7 +31,7 @@ public class LoginView extends JFrame {
     }
 
     private void initUI() {
-
+        
         Font boldFont = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -57,41 +58,41 @@ public class LoginView extends JFrame {
         gbc.gridy = 0;
         mainContentPanel.add(new JLabel("Tên đăng nhập:", SwingConstants.RIGHT), gbc);
 
-        gbc.gridx = 1;
-        mainContentPanel.add(usernameField, gbc);
+    gbc.gridx = 1;
+    mainContentPanel.add(usernameField, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        mainContentPanel.add(new JLabel("Mật khẩu:", SwingConstants.RIGHT), gbc);
+    gbc.gridx = 0;
+    gbc.gridy = 1;
+    mainContentPanel.add(new JLabel("Mật khẩu:", SwingConstants.RIGHT), gbc);
 
-        gbc.gridx = 1;
-        mainContentPanel.add(passwordField, gbc);
+    gbc.gridx = 1;
+    mainContentPanel.add(passwordField, gbc);
 
-        // Panel chứa các nút
-        JPanel buttonPanel = new JPanel(new FlowLayout()); // Căn giữa các nút
-        loginButton.setFont(boldFont);
-        buttonPanel.add(loginButton);
+    // Panel chứa các nút
+    JPanel buttonPanel = new JPanel(new FlowLayout()); // Căn giữa các nút
+    loginButton.setFont(boldFont);
+    buttonPanel.add(loginButton);
 
-        registerButton.setFont(boldFont);
-        buttonPanel.add(registerButton);
+    registerButton.setFont(boldFont);
+    buttonPanel.add(registerButton);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2; // Chiếm cả hai cột
-        mainContentPanel.add(buttonPanel, gbc);
+    gbc.gridx = 0;
+    gbc.gridy = 2;
+    gbc.gridwidth = 2; // Chiếm cả hai cột
+    mainContentPanel.add(buttonPanel, gbc);
 
-        JPanel errorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Căn giữa label thông báo lỗi
-        JLabel errorLabel = new JLabel("Sai tên đăng nhập hoặc mật khẩu");
-        errorLabel.setForeground(Color.RED);
-        errorLabel.setVisible(false);
-        errorPanel.add(errorLabel);
+    JPanel errorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Căn giữa label thông báo lỗi
+    JLabel errorLabel = new JLabel("Sai tên đăng nhập hoặc mật khẩu");
+    errorLabel.setForeground(Color.RED);
+    errorLabel.setVisible(false);
+    errorPanel.add(errorLabel);
 
-        gbc.gridy = 3;
-        mainContentPanel.add(errorPanel, gbc);
+    gbc.gridy = 3; 
+    mainContentPanel.add(errorPanel, gbc);
 
-        mainPanel.add(mainContentPanel, BorderLayout.CENTER); // Thêm mainContentPanel vào giữa mainPanel
+    mainPanel.add(mainContentPanel, BorderLayout.CENTER); // Thêm mainContentPanel vào giữa mainPanel
 
-        add(mainPanel);
+    add(mainPanel);
 
         registerButton.addActionListener(new ActionListener() {
             @Override
@@ -115,8 +116,7 @@ public class LoginView extends JFrame {
         });
     }
 
-    private boolean checkLoginSuccess = false;
-
+    private boolean checkLoginSuccess = false; 
     private void loginUser() {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
@@ -137,15 +137,15 @@ public class LoginView extends JFrame {
                 JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
                 Player player = new Player(username, password);
                 dispose();
-
+                
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        GameSession gameSession = new GameSession();
-                        gameSession.addPlayer(player);
-                        new HomeView(gameSession).setVisible(true);
-                    }
-                });
+                @Override
+                public void run() {
+                    GameSession gameSession = new GameSession();
+                    gameSession.addPlayer(player);
+                    new HomeView(gameSession).setVisible(true);
+                }
+            });
             } else {
                 JOptionPane.showMessageDialog(this, "Tên đăng nhập hoặc mật khẩu không đúng!");
             }
@@ -168,4 +168,4 @@ public class LoginView extends JFrame {
         registrationFuture = new CompletableFuture<>();
         return registrationFuture.join();
     }
-}
+} 

@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class RegisterView extends JFrame {
     private JTextField usernameField;
+    private JTextField emaField;
     private JPasswordField passwordField;
     private JButton registerButton;
     private JButton loginButton;
@@ -21,7 +22,7 @@ public class RegisterView extends JFrame {
 
     public RegisterView() {
         setUndecorated(true);
-        setSize(500, 300);
+        setSize(550, 350); 
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initUI();
@@ -41,7 +42,9 @@ public class RegisterView extends JFrame {
         titlePanel.add(titleLabel);
         mainPanel.add(titlePanel, BorderLayout.NORTH);
 
+
         usernameField = new JTextField(20);
+        emaField = new JTextField(20);
         passwordField = new JPasswordField(20);
         JPasswordField confirmPasswordField = new JPasswordField(20);
 
@@ -61,12 +64,18 @@ public class RegisterView extends JFrame {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
+        mainContentPanel.add(new JLabel("Email:", SwingConstants.RIGHT), gbc);
+        gbc.gridx = 1;
+        mainContentPanel.add(emaField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         mainContentPanel.add(new JLabel("Mật khẩu:", SwingConstants.RIGHT), gbc);
         gbc.gridx = 1;
         mainContentPanel.add(passwordField, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 2; // Hàng mới cho label "Nhập lại mật khẩu"
+        gbc.gridy = 3; // Hàng mới cho label "Nhập lại mật khẩu"
         mainContentPanel.add(new JLabel("Nhập lại mật khẩu:", SwingConstants.RIGHT), gbc);
         gbc.gridx = 1;
         mainContentPanel.add(confirmPasswordField, gbc);
@@ -79,8 +88,8 @@ public class RegisterView extends JFrame {
         buttonPanel.add(loginButton);
 
         gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
+        gbc.gridy = 4; 
+        gbc.gridwidth = 2; 
         mainContentPanel.add(buttonPanel, gbc);
 
         JPanel errorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Căn giữa label thông báo lỗi
@@ -89,7 +98,7 @@ public class RegisterView extends JFrame {
         errorLabel.setVisible(false);
         errorPanel.add(errorLabel);
 
-        gbc.gridy = 4;
+        gbc.gridy = 5; 
         mainContentPanel.add(errorPanel, gbc);
 
         mainPanel.add(mainContentPanel, BorderLayout.CENTER); // Thêm mainContentPanel vào giữa mainPanel
@@ -104,9 +113,12 @@ public class RegisterView extends JFrame {
 
                 if (!password.equals(confirmPassword)) {
                     errorLabel.setText("Mật khẩu không khớp");
-                    errorLabel.setVisible(true);
+                    errorLabel.setVisible(true); // Hiển thị thông báo lỗi nếu mật khẩu không khớp
+                } else if(password.isEmpty() || confirmPassword.isEmpty()){
+                    errorLabel.setText("Mật khẩu không được để trống");
+                    errorLabel.setVisible(true); // Hiển thị thông báo lỗi nếu mật khẩu trống
                 } else {
-                    registerUser(); // Tiếp tục đăng ký nếu mật khẩu khớp
+                    registerUser(); 
                 }
             }
         });
@@ -122,24 +134,24 @@ public class RegisterView extends JFrame {
 
     private void registerUser() {
         String username = usernameField.getText();
+        String email = emaField.getText();
         String password = new String(passwordField.getPassword());
 
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username và mật khẩu không được để trống!");
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin!");
             return;
         }
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+            String sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, username);
-            stmt.setString(2, password);
+            stmt.setString(2, email);  // Thêm giá trị email vào câu truy vấn
+            stmt.setString(3, password);
 
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {
                 JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
-                Player player = new Player(username, password);
-                registrationFuture.complete(player);
                 dispose();
                 new LoginView().setVisible(true);
             }
@@ -151,18 +163,18 @@ public class RegisterView extends JFrame {
             }
         }
     }
-
-    public Player waitForRegistration() {
-        registrationFuture = new CompletableFuture<>();
-        return registrationFuture.join();
+    
+        public Player waitForRegistration() {
+            registrationFuture = new CompletableFuture<>();
+            return registrationFuture.join();
+        }
+    
+        public static void main(String[] args) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    new RegisterView().setVisible(true);
+                }
+            });
+        }
     }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new RegisterView().setVisible(true);
-            }
-        });
-    }
-}
