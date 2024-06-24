@@ -1,27 +1,34 @@
 package view;
 
 import controller.MultiPlayerController;
-import model.GameSession;
-import model.Player;
-
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.util.Random;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
+import javax.swing.border.EmptyBorder;
+import model.GameSession;
 
 public class MultiPlayerView extends JFrame {
     private GameSession gameSession;
     private MultiPlayerController controller;
+    private int currentNumber;
+    private JButton[] numberButtons;
+    private HomeView homeView;
 
-    private JPanel playerPanel;
-    private JTextField numberField;
-    private JButton guessButton;
-    private JTextArea chatArea;
-    private JTextField chatField;
-    private JButton sendButton;
+    private JPanel mainPanel;
+    private JLabel findLabel;
+    private JLabel numberLabel;
+    private JLabel timerLabel;
 
-    public MultiPlayerView(GameSession gameSession) {
+    public MultiPlayerView(HomeView homeview,GameSession gameSession) {
+        this.homeView = homeview;
         this.gameSession = gameSession;
         setTitle("Number Finding Game - Multiplayer");
         setSize(800, 600);
@@ -30,69 +37,180 @@ public class MultiPlayerView extends JFrame {
 
         // Khởi tạo MultiPlayerController
         controller = new MultiPlayerController(gameSession, this);
-
         initUI();
     }
 
     private void initUI() {
-        JPanel mainPanel = new JPanel(new BorderLayout(20, 20));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout());
+        JPanel topPanel = new JPanel(new GridBagLayout());
+        topPanel.setBorder(new EmptyBorder(10, 10, 0, 10));
+        GridBagConstraints gbc = new GridBagConstraints();
+        //Nút "Quay lại"
+        ImageIcon backIcon = new ImageIcon(GameView.class.getResource("/images/backIcon.png"));
+        Image image = backIcon.getImage();
+        Image newimg = image.getScaledInstance(35, 35, java.awt.Image.SCALE_AREA_AVERAGING);
+        backIcon = new ImageIcon(newimg);
+        JButton homeButton = new JButton(backIcon);
+        homeButton.setPreferredSize(new Dimension(35, 35));
+        homeButton.setBorder(null); // Loại bỏ viền
+        homeButton.setBorderPainted(false); // Loại bỏ viền vẽ
+        homeButton.setContentAreaFilled(false); // Đảm bảo nền trong suốt
 
-        // Bảng hiển thị người chơi
-        playerPanel = new JPanel(new GridLayout(0, 1, 10, 10));
-        JScrollPane playerScrollPane = new JScrollPane(playerPanel);
-        playerScrollPane.setPreferredSize(new Dimension(200, 0));
 
-        // Khu vực nhập số và đoán
-        JPanel guessPanel = new JPanel(new BorderLayout(10, 10));
-        numberField = new JTextField();
-        guessButton = new JButton("Guess");
-        guessButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.makeGuess(numberField.getText());
-                numberField.setText("");
-            }
-        });
-        guessPanel.add(numberField, BorderLayout.CENTER);
-        guessPanel.add(guessButton, BorderLayout.EAST);
+        // Thành phần giữa: "Find:" và số cần tìm
+        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Căn giữa
+        findLabel = new JLabel("Find:");
+        numberLabel = new JLabel(String.valueOf(getRandomNumber()), JLabel.CENTER); // Lấy số từ gameSession
+        centerPanel.add(findLabel);
+        centerPanel.add(numberLabel);
 
-        // Khu vực chat
-        chatArea = new JTextArea();
-        chatArea.setEditable(false);
-        JScrollPane chatScrollPane = new JScrollPane(chatArea);
-        chatField = new JTextField();
-        sendButton = new JButton("Send");
-        sendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.sendMessage(chatField.getText());
-                chatField.setText("");
-            }
-        });
-        JPanel chatPanel = new JPanel(new BorderLayout(10, 10));
-        chatPanel.add(chatScrollPane, BorderLayout.CENTER);
-        chatPanel.add(chatField, BorderLayout.WEST);
-        chatPanel.add(sendButton, BorderLayout.EAST);
+        timerLabel = new JLabel("3:00"); // Bắt đầu từ 3 phút
+       
+        gbc.gridx = 0; // Cột 0
+        gbc.gridy = 0; // Hàng 0
+        gbc.weightx = 0.2; // Chiếm 20% chiều rộng
+        topPanel.add(homeButton, gbc);
 
-        mainPanel.add(playerScrollPane, BorderLayout.WEST);
-        mainPanel.add(guessPanel, BorderLayout.NORTH);
-        mainPanel.add(chatPanel, BorderLayout.CENTER);
+        gbc.gridx = 1; // Cột 1
+        gbc.gridy = 0; 
+        gbc.weightx = 0.6; // Chiếm 60% chiều rộng
+        topPanel.add(centerPanel, gbc);
 
-        add(mainPanel, BorderLayout.CENTER);
-    }
+// Thời gian đếm ngược (bên phải)
+        gbc.gridx = 2; // Cột 2
+        gbc.gridy = 0; 
+        gbc.weightx = 0.2; // Chiếm 20% chiều rộng
+        topPanel.add(timerLabel, gbc);
 
-    public void updatePlayerList(List<Player> players) {
-        playerPanel.removeAll();
-        for (Player player : players) {
-            JLabel playerLabel = new JLabel(player.getUsername());
-            playerPanel.add(playerLabel);
+        mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbcMain = new GridBagConstraints();
+        gbcMain.weighty = 1.0; 
+        gbcMain.insets = new Insets(0, 0, 0, 0);
+
+    // Left Panel (chứa label "Hello")
+    JPanel leftPanel = new JPanel(new GridBagLayout());
+    GridBagConstraints gbcLeft = new GridBagConstraints();
+    gbcLeft.gridx = 0;
+    gbcLeft.gridy = 0;
+    gbcLeft.anchor = GridBagConstraints.CENTER;
+    JPanel buttonPanel = new JPanel(new GridLayout(10, 10, 10, 10));
+        numberButtons = new JButton[100];
+        for (int i = 0; i < 100; i++) {
+            numberButtons[i] = new JButton(String.valueOf(i + 1));
+            numberButtons[i].addActionListener(e -> handleNumberClick(Integer.parseInt(((JButton) e.getSource()).getText())));
+            buttonPanel.add(numberButtons[i]);
         }
-        playerPanel.revalidate();
-        playerPanel.repaint();
+    leftPanel.add(buttonPanel,gbcLeft);
+
+    // Right Panel (chứa label "List user")
+    JPanel rightPanel = new JPanel(new GridBagLayout());
+    GridBagConstraints gbcRight = new GridBagConstraints();
+    gbcRight.gridx = 0;
+    gbcRight.gridy = 0;
+    gbcRight.anchor = GridBagConstraints.CENTER;
+    rightPanel.add(new JLabel("List user"), gbcRight);
+    int n=0;
+    JPanel listPanel = new JPanel(new GridLayout(1,n));
+    for (int i = 0; i < 5; i++) {
+        
+    }
+    
+
+    // Thêm các panel vào mainPanel
+    gbcMain.gridx = 0;
+    gbcMain.gridy = 0;
+    gbcMain.weightx = 0.7; 
+    mainPanel.add(leftPanel, gbcMain);
+
+    gbcMain.gridx = 1;
+    gbcMain.gridy = 0;
+    gbcMain.weightx = 0.3;
+    mainPanel.add(rightPanel, gbcMain); 
+    
+    
+
+    // Thêm các panel vào frame chính
+    add(topPanel, BorderLayout.NORTH);
+    add(mainPanel, BorderLayout.CENTER); 
+
+        homeButton.addActionListener(e -> {
+            // Gọi phương thức để chuyển về homeview
+            returnToHomeView(); 
+        });
     }
 
-    public void appendChatMessage(String message) {
-        chatArea.append(message + "\n");
+    private int getRandomNumber() {
+        Random random = new Random();
+        currentNumber = random.nextInt(100) + 1;
+        return currentNumber;
+    }
+    private void returnToHomeView() {
+        if (homeView != null) { // Kiểm tra xem homeView có null không
+            this.dispose();     // Đóng GameView
+            homeView.setVisible(true); // Hiển thị lại HomeView
+            homeView.toFront(); // Đưa HomeView lên trên cùng
+        } else {
+            System.err.println("Lỗi: homeView chưa được khởi tạo!");
+            // Xử lý lỗi ở đây, ví dụ: hiển thị thông báo lỗi hoặc thoát chương trình
+        }
+    }
+
+
+    private void handleNumberClick(int number) {
+
+        if (number == currentNumber) {
+            new Thread(() -> {
+                try {
+                    for (int i = 0; i < 5; i++) { // Nhấp nháy 5 lần
+                        highlightNumber(number, Color.green); // Màu vàng
+                        Thread.sleep(200); // Dừng 200ms
+                        resetNumber(number);
+                        Thread.sleep(200);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            gameSession.getPlayers().get(0).setScore(gameSession.getPlayers().get(0).getScore() + 1);
+/*             updatePlayerScore(gameSession.getPlayers().get(0));
+ */            resetNumber(number); 
+    
+            // Reset tất cả các nút đã chọn sai trước đó
+            for (int i = 0; i < numberButtons.length; i++) {
+                if (i != number - 1 && numberButtons[i].getBackground() == Color.RED) {
+                    resetNumber(i + 1); // Reset màu của nút
+                }
+            }
+    
+            if (gameSession.getNumbers().isEmpty()) {
+                showGameOverMessage("Congratulations! You've found all the numbers.");
+            } else {
+                updateNextNumber(getRandomNumber());
+            }
+        } else {
+            highlightNumber(number, Color.RED);
+            resetNumber(currentNumber); 
+        }
+    }
+
+    public void highlightNumber(int number, Color color) {
+        numberButtons[number - 1].setBackground(color);
+        numberButtons[number - 1].setOpaque(true);
+        numberButtons[number - 1].setBorderPainted(false);
+    }
+    
+    public void resetNumber(int number) {
+        numberButtons[number - 1].setBackground(null);
+        numberButtons[number - 1].setOpaque(false);
+        numberButtons[number - 1].setBorderPainted(true);
+    }
+
+    public void updateNextNumber(int number) {
+        numberLabel.setText(String.valueOf(number));
+    }
+
+    public void showGameOverMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
     }
 }

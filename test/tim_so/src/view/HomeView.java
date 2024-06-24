@@ -14,7 +14,7 @@ public class HomeView extends JFrame {
     public HomeView(GameSession gameSession) {
         this.gameSession = gameSession;
         instance = this; // Gán instance khi khởi tạo HomeView
-
+        setUndecorated(true); 
         setTitle("Number Finding Game");
         setSize(400, 300);
         setLocationRelativeTo(null);
@@ -29,6 +29,18 @@ public class HomeView extends JFrame {
         }
     }
     private void initUI() {
+        Font boldFont = new Font(Font.SANS_SERIF, Font.BOLD, 14);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.WHITE);
+
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Căn giữa tiêu đề
+        titlePanel.setBackground(Color.WHITE);
+        JLabel titleLabel = new JLabel("Number Finding Game");
+        titleLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
+        titlePanel.add(titleLabel);
+        mainPanel.add(titlePanel, BorderLayout.NORTH);
+
         JPanel panel = new JPanel(new GridLayout(4, 1, 20, 20));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -70,6 +82,7 @@ public class HomeView extends JFrame {
         panel.add(exitButton);
 
         add(panel, BorderLayout.CENTER);
+        add(mainPanel,BorderLayout.NORTH);
     }
 
     private void startSinglePlayerGame() {
@@ -81,7 +94,7 @@ public class HomeView extends JFrame {
     private void startMultiPlayerGame() {
         // Khởi động chế độ chơi nhiều người
         dispose();
-        new MultiPlayerView(gameSession).setVisible(true);
+        new MultiPlayerView(this,gameSession).setVisible(true);
     }
 
     private void showLeaderboard() {

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.util.Random;
@@ -29,7 +30,7 @@ public class GameView extends JFrame {
     public GameView(HomeView homeview,GameSession gameSession) {
         this.homeView = homeview;
         this.gameSession = gameSession;
-        setTitle("Number Finding Game");
+        setUndecorated(true); 
         setSize(700, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -38,6 +39,18 @@ public class GameView extends JFrame {
     }
 
     private void initUI() {
+        Font boldFont = new Font(Font.SANS_SERIF, Font.BOLD, 14);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.WHITE);
+
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Căn giữa tiêu đề
+        titlePanel.setBackground(Color.WHITE);
+        JLabel titleLabel = new JLabel("Number Finding Game");
+        titleLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
+        titlePanel.add(titleLabel);
+        mainPanel.add(titlePanel, BorderLayout.NORTH);
+        
         // Header panel (chứa tên người dùng, nút Quay lại, và nút Setting)
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Thêm padding xung quanh
@@ -96,9 +109,8 @@ public class GameView extends JFrame {
         northPanel.add(topPanel);
 
         // Main layout (sắp xếp các thành phần chính)
-        add(northPanel, BorderLayout.NORTH); // Thêm northPanel vào vị trí NORTH
-        add(buttonPanel, BorderLayout.CENTER); // Đặt buttonPanel ở giữa
-
+        add(northPanel, BorderLayout.NORTH); 
+        add(buttonPanel, BorderLayout.CENTER); 
         homeButton.addActionListener(e -> {
             // Gọi phương thức để chuyển về homeview
             returnToHomeView(); 
