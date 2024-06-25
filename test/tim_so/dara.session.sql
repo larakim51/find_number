@@ -1,15 +1,14 @@
 -- Tạo cơ sở dữ liệu (nếu chưa tồn tại)
+DROP TABLE usersAcc;
+DROP TABLE game_session_players;
+DROP TABLE game_sessions;
+
 USE game_db;
-DROP TABLE users;
 
 CREATE DATABASE IF NOT EXISTS game_db;
-
--- Sử dụng cơ sở dữ liệu
-USE game_db;
-
 -- Tạo bảng users
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE usersAcc (
+    `UID` varchar(255) NOT NULL,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -34,10 +33,16 @@ CREATE TABLE game_sessions (
 
 -- Tạo bảng game_session_players
 CREATE TABLE game_session_players (
-    session_id INT,
-    user_id INT,
-    score INT DEFAULT 0,
-    PRIMARY KEY (session_id, user_id),
-    FOREIGN KEY (session_id) REFERENCES game_sessions(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    `UID` varchar(255) NOT NULL,
+  `IdRoom` varchar(255) NOT NULL,
+  `playerColor` varchar(255) NOT NULL,
+  `point` int(11) NOT NULL,
+  `KetQua` varchar(255) NOT NULL
 );
+
+ALTER TABLE `game_session_players`
+  ADD PRIMARY KEY (`UID`,`IdRoom`);
+
+ALTER TABLE `usersAcc`
+  ADD PRIMARY KEY (`UID`);
+COMMIT;
