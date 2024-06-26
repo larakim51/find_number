@@ -1,43 +1,62 @@
 package network;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.*;
-import java.util.Iterator;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import model.GameData;
 
 public class GameServer {
+    private static final int PORT = 12345; // Cổng lắng nghe
+    private static final Map<String, GameData> games = new HashMap<>(); // Lưu trữ các ván chơi
 
-    public static void main(String[] args) throws IOException {
-        Selector selector = Selector.open();
-        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-        serverSocketChannel.bind(new InetSocketAddress("localhost", 8080));
-        serverSocketChannel.configureBlocking(false);
-        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+    public static void main(String[] args) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("Server đang lắng nghe trên cổng " + PORT);
 
-        while (true) {
-            selector.select(); // Chờ sự kiện
-            Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("Client kết nối: " + clientSocket);
 
-            while (keys.hasNext()) {
-                SelectionKey key = keys.next();
-                keys.remove();
+                new Thread(new ClientHandler(clientSocket)).start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-                if (key.isAcceptable()) {
-                    // Chấp nhận kết nối mới
-                    SocketChannel clientChannel = serverSocketChannel.accept();
-                    clientChannel.configureBlocking(false);
-                    clientChannel.register(selector, SelectionKey.OP_READ);
-                } else if (key.isReadable()) {
-                    // Đọc dữ liệu từ client
-                    SocketChannel clientChannel = (SocketChannel) key.channel();
-                    ByteBuffer buffer = ByteBuffer.allocate(1024);
-                    int bytesRead = clientChannel.read(buffer);
-                    if (bytesRead > 0) {
-                        // Xử lý dữ liệu nhận được
-                    }
-                }
+    // ... (Các phương thức xử lý đăng nhập, tạo phòng, vào phòng, xử lý dữ liệu từ client, ...)
+}
+
+class ClientHandler implements Runnable {
+    private Socket clientSocket;
+    private BufferedReader in;
+    private PrintWriter out;
+
+    public ClientHandler(Socket socket) {
+        this.clientSocket = socket;
+        try {
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            String message;
+            while ((message = in.readLine()) != null) {
+                // Xử lý message từ client
+                // ...
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 }
-

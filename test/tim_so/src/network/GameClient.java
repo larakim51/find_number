@@ -1,25 +1,26 @@
 package network;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.io.*;
+import java.net.*;
 
 public class GameClient {
+    private static final String SERVER_ADDRESS = "localhost"; // Địa chỉ server
+    private static final int PORT = 12345; // Cổng kết nối
 
-    public static void main(String[] args) throws IOException {
-        SocketChannel socketChannel = SocketChannel.open();
-        socketChannel.connect(new InetSocketAddress("localhost", 8080));
+    public static void main(String[] args) {
+        try (Socket socket = new Socket(SERVER_ADDRESS, PORT);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
 
-        // Gửi dữ liệu đến server
-        ByteBuffer buffer = ByteBuffer.wrap("Hello Server!".getBytes());
-        socketChannel.write(buffer);
+            // Gửi thông tin đăng nhập hoặc yêu cầu tạo phòng
+            // ...
 
-        // Đọc dữ liệu từ server
-        ByteBuffer readBuffer = ByteBuffer.allocate(1024);
-        int bytesRead = socketChannel.read(readBuffer);
-        if (bytesRead > 0) {
-            // Xử lý dữ liệu nhận được
+            String message;
+            while ((message = in.readLine()) != null) {
+                // Xử lý message từ server
+                // ...
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
-
