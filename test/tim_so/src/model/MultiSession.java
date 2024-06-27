@@ -3,13 +3,13 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerSession {
+public class MultiSession {
     private Player player;
     private String color;
     private List<Integer> foundNumbers;
     private int score;
 
-    public PlayerSession(Player player, GameData gameData, String color) {
+    public MultiSession(Player player, GameData gameData, String color) {
         this.player = player;
         this.color = color;
         this.foundNumbers = new ArrayList<>();

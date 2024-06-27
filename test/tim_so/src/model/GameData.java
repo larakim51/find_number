@@ -16,7 +16,7 @@ public class GameData extends Observable{
     private int gameDuration;
     private int luckyNumber;
     private int luckyNumberBonus = 5; 
-    private Map<Player, PlayerSession> playerSessions = new HashMap<>();
+    private Map<Player, MultiSession> playerSessions = new HashMap<>();
     private int currentNumber;
     private int currentPlayerIndex = 0;
     private boolean gameOver;
@@ -39,7 +39,7 @@ public class GameData extends Observable{
         // Khởi tạo các PlayerSession từ database
     }
     public void addPlayerSession(Player player, String color) {
-        PlayerSession playerSession = new PlayerSession(player, this, color);
+        MultiSession playerSession = new MultiSession(player, this, color);
         playerSessions.put(player, playerSession);
     }
     public void setPlayers(Map<Player, String> playerColors) {
@@ -47,14 +47,14 @@ public class GameData extends Observable{
         for (Map.Entry<Player, String> entry : playerColors.entrySet()) {
             Player player = entry.getKey();
             String color = entry.getValue();
-            PlayerSession playerSession = new PlayerSession(player, this, color);
+            MultiSession playerSession = new MultiSession(player, this, color);
             this.playerSessions.put(player, playerSession);
         }
         this.numPlayers = playerSessions.size();
         this.luckyNumber = numbersToFind.get((int) (Math.random() * 100));
     }
 
-    public boolean checkNumber(PlayerSession playerSession, int number) {
+    public boolean checkNumber(MultiSession playerSession, int number) {
         if (number == currentNumber) {
             playerSession.getFoundNumbers().add(number);
             if (number == luckyNumber) {
@@ -122,7 +122,7 @@ public class GameData extends Observable{
         return luckyNumberBonus;
     }
 
-    public Map<Player, PlayerSession> getPlayers() {
+    public Map<Player, MultiSession> getPlayers() {
         return playerSessions;
     }
 
@@ -137,11 +137,11 @@ public class GameData extends Observable{
 
     // ... (Thêm các setters nếu cần)
 
-    public PlayerSession getCurrentPlayer() {
-        return (PlayerSession) playerSessions.values().toArray()[currentPlayerIndex];
+    public MultiSession getCurrentPlayer() {
+        return (MultiSession) playerSessions.values().toArray()[currentPlayerIndex];
     }
 
-    public void addPlayerSession(Player player, PlayerSession ps){
+    public void addPlayerSession(Player player, MultiSession ps){
         playerSessions.put(player, ps);
     }
 }
