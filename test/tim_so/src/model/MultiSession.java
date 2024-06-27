@@ -3,14 +3,14 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Player;
 
-public class PlayerSession {
+public class MultiSession {
     private Player player; // Sử dụng Player thay vì User
     private GameData game;
     private String color;
     private List<Integer> foundNumbers;
     private int score;
 
-    public PlayerSession(Player player, GameData game, String color) {
+    public MultiSession(Player player, GameData game, String color) {
         this.player = player;
         this.game = game;
         this.color = color;

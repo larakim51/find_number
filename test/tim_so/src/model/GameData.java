@@ -13,7 +13,7 @@ public class GameData {
     private int gameDuration;
     private int luckyNumber;
     private int luckyNumberBonus = 5; 
-    private List<PlayerSession> players;
+    private List<MultiSession> players;
     private int currentNumber;
     private int currentPlayerIndex;
 
@@ -33,7 +33,7 @@ public class GameData {
         // Khởi tạo các PlayerSession từ database
     }
 
-    public boolean checkNumber(PlayerSession player, int number) {
+    public boolean checkNumber(MultiSession player, int number) {
         if (number == currentNumber) {
             player.getFoundNumbers().add(number);
             if (number == luckyNumber) {
@@ -96,7 +96,7 @@ public class GameData {
         return luckyNumberBonus;
     }
 
-    public List<PlayerSession> getPlayers() {
+    public List<MultiSession> getPlayers() {
         return players;
     }
 
@@ -110,7 +110,7 @@ public class GameData {
 
     // ... (Thêm các setters nếu cần)
 
-    public PlayerSession getCurrentPlayer() {
+    public MultiSession getCurrentPlayer() {
         return players.get(currentPlayerIndex);
     }
 }
