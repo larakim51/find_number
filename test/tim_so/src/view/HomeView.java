@@ -1,7 +1,6 @@
 package view;
 
 import model.GameSession;
-import model.Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,13 +10,10 @@ import java.awt.event.ActionListener;
 public class HomeView extends JFrame {
     private GameSession gameSession;
     private static HomeView instance;
-    private Player player;
-    
 
-    public HomeView(Player player, GameSession gameSession) {
-        this.player = player; 
+    public HomeView(GameSession gameSession) {
         this.gameSession = gameSession;
-        instance = this; 
+        instance = this; // Gán instance khi khởi tạo HomeView
         setUndecorated(true); 
         setTitle("Number Finding Game");
         setSize(400, 300);
@@ -92,13 +88,13 @@ public class HomeView extends JFrame {
     private void startSinglePlayerGame() {
         // Khởi động chế độ chơi 1 người
         dispose();
-        new GameView(player,this,gameSession).setVisible(true);
+        new GameView(this,gameSession).setVisible(true);
     }
 
     private void startMultiPlayerGame() {
         // Khởi động chế độ chơi nhiều người
         dispose();
-        new MultiPlayerView(player, gameSession).setVisible(true);
+        new MultiPlayerView(this,gameSession).setVisible(true);
     }
 
     private void showLeaderboard() {
@@ -107,8 +103,12 @@ public class HomeView extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new LoginView().setVisible(true); // Chỉ hiển thị LoginView khi bắt đầu chương trình
+        GameSession gameSession = new GameSession();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new HomeView(gameSession).setVisible(true);
+            }
         });
     }
 }

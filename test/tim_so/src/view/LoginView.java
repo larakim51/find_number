@@ -2,7 +2,6 @@ package view;
 
 import database.DatabaseConnection;
 import model.GameSession;
-import model.MultiSession;
 import model.Player;
 
 import javax.swing.*;
@@ -121,8 +120,6 @@ public class LoginView extends JFrame {
     }
 
     private boolean checkLoginSuccess = false;
-    private MultiSession multiSession = new MultiSession();
-    private int gameDuration = 300;
 
     private void loginUser() {
         String username = usernameField.getText();
@@ -139,11 +136,13 @@ public class LoginView extends JFrame {
             Player player = new Player(username, password);
             dispose();
 
-            SwingUtilities.invokeLater(() -> {
-                int roomId = multiSession.createGame(player, gameDuration); // Lấy roomId
-                GameSession gameSession = multiSession.getGameSession(roomId); // Lấy GameSession từ roomId
-                gameSession.addPlayer(player);
-                new HomeView(player, gameSession).setVisible(true);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    GameSession gameSession = new GameSession();
+                    gameSession.addPlayer(player);
+                    new HomeView(gameSession).setVisible(true);
+                }
             });
         } else {
             JOptionPane.showMessageDialog(this, "Tên đăng nhập hoặc mật khẩu không đúng!");

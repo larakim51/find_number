@@ -5,8 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 
-public class GameData {
+public class GameData extends Observable{
     private int id;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -53,25 +54,28 @@ public class GameData {
         this.luckyNumber = numbersToFind.get((int) (Math.random() * 100));
     }
 
-    public boolean checkNumber(Player player, int number) { // Sử dụng PlayerSession
+    public boolean checkNumber(PlayerSession playerSession, int number) {
         if (number == currentNumber) {
-            player.getFoundNumbers().add(number);
+            playerSession.getFoundNumbers().add(number);
             if (number == luckyNumber) {
-                player.updateScore(luckyNumberBonus);
+                playerSession.updateScore(luckyNumberBonus);
             }
-            player.updateScore(1);
+            playerSession.updateScore(1);
 
             if (numbersToFind.isEmpty()) {
-                end();
+                endGame();
             } else {
                 currentNumber = numbersToFind.remove(0);
                 nextTurn();
+                setChanged();
+                notifyObservers(currentNumber); // Thông báo số mới cho GameView
             }
-            return true; 
+            return true;
         } else {
-            return false; 
+            return false;
         }
     }
+
     public boolean isGameOver() {
         return numbersToFind.isEmpty() || LocalDateTime.now().isAfter(endTime); // Kiểm tra hết số hoặc hết giờ
     }
@@ -79,12 +83,11 @@ public class GameData {
         currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
     }
 
-    public void end() {
-        gameOver = true;
+    public void endGame() {
         endTime = LocalDateTime.now();
-        // Cập nhật kết quả vào database
+        setChanged();
+        notifyObservers("GAME_OVER"); // Thông báo kết thúc game cho GameView
     }
-
     // Getters và setters
 
     public int getId() {
