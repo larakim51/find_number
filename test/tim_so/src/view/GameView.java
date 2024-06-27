@@ -26,6 +26,7 @@ public class GameView extends JFrame {
     private JLabel scoreLabel;
     private int currentNumber;
     private HomeView homeView;
+    private Player player;
 
     public GameView(HomeView homeview,GameSession gameSession) {
         this.homeView = homeview;
@@ -36,6 +37,10 @@ public class GameView extends JFrame {
         setLocationRelativeTo(null);
         initUI();
         setVisible(true);
+    }
+    public GameView(Player player) {
+        this.player = player;
+        // ... (khởi tạo các thành phần khác của giao diện)
     }
 
     private void initUI() {

@@ -91,7 +91,7 @@ public class HomeView extends JFrame {
     private void startSinglePlayerGame() {
         // Khởi động chế độ chơi 1 người
         dispose();
-        new GameView(player, gameSession).setVisible(true);
+        new GameView(player).setVisible(true);
     }
 
     private void startMultiPlayerGame() {

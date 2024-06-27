@@ -16,6 +16,9 @@ public class MultiSession {
         return roomId;
     }
 
+    public GameSession getGameSession(int roomId) {
+        return gameSessions.get(roomId);
+    }
 
     private int generateRoomId() {
         Random random = new Random();

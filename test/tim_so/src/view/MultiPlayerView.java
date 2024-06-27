@@ -14,6 +14,7 @@ import java.util.Random;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import model.GameSession;
+import model.Player;
 
 public class MultiPlayerView extends JFrame {
     private GameSession gameSession;
@@ -21,6 +22,7 @@ public class MultiPlayerView extends JFrame {
     private int currentNumber;
     private JButton[] numberButtons;
     private HomeView homeView;
+    private Player player;
 
     private JPanel mainPanel;
     private JLabel findLabel;
@@ -38,6 +40,11 @@ public class MultiPlayerView extends JFrame {
         // Khởi tạo MultiPlayerController
         controller = new MultiPlayerController(gameSession, this);
         initUI();
+    }
+    public MultiPlayerView(Player player, GameSession gameSession) {
+        this.player = player;
+        this.gameSession = gameSession;
+        // ... (khởi tạo các thành phần khác của giao diện)
     }
 
     private void initUI() {

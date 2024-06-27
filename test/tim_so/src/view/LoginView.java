@@ -140,9 +140,10 @@ public class LoginView extends JFrame {
             dispose();
 
             SwingUtilities.invokeLater(() -> {
-                GameSession gameSession = multiSession.createGame(player, gameDuration); // Tạo game mới
-                gameSession.addPlayer(player); // Thêm người chơi vào game vừa tạo
-                new HomeView(player, gameSession).setVisible(true); // Truyền player vào HomeView
+                int roomId = multiSession.createGame(player, gameDuration); // Lấy roomId
+                GameSession gameSession = multiSession.getGameSession(roomId); // Lấy GameSession từ roomId
+                gameSession.addPlayer(player);
+                new HomeView(player, gameSession).setVisible(true);
             });
         } else {
             JOptionPane.showMessageDialog(this, "Tên đăng nhập hoặc mật khẩu không đúng!");
