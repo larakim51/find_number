@@ -8,7 +8,7 @@ USE game_db;
 CREATE DATABASE IF NOT EXISTS game_db;
 -- Tạo bảng users
 CREATE TABLE usersAcc (
-    `UID` varchar(255) NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -33,16 +33,13 @@ CREATE TABLE game_sessions (
 
 -- Tạo bảng game_session_players
 CREATE TABLE game_session_players (
-    `UID` varchar(255) NOT NULL,
-  `IdRoom` varchar(255) NOT NULL,
-  `playerColor` varchar(255) NOT NULL,
-  `point` int(11) NOT NULL,
-  `KetQua` varchar(255) NOT NULL
+    IdRoom INT NOT NULL,
+    id INT NOT NULL,  -- ID của người chơi (từ bảng usersAcc)
+    playerColor varchar(255) NOT NULL,
+    point int(11) NOT NULL,
+    KetQua varchar(255) NOT NULL,
+    PRIMARY KEY (IdRoom, id),  -- Khóa chính ghép
+    FOREIGN KEY (IdRoom) REFERENCES game_sessions(id), -- Khóa ngoại liên kết đến game_sessions
+    FOREIGN KEY (id) REFERENCES usersAcc(id) -- Khóa ngoại liên kết đến usersAcc
 );
 
-ALTER TABLE `game_session_players`
-  ADD PRIMARY KEY (`UID`,`IdRoom`);
-
-ALTER TABLE `usersAcc`
-  ADD PRIMARY KEY (`UID`);
-COMMIT;

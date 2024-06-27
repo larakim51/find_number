@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
+import controller.LoginController;
 
 public class LoginView extends JFrame {
     private JTextField usernameField;
@@ -20,13 +21,14 @@ public class LoginView extends JFrame {
     private JButton loginButton;
     private JButton registerButton;
     private CompletableFuture<Player> registrationFuture;
-
+    private LoginController loginController;
 
     public LoginView() {
         setUndecorated(true); 
         setSize(500, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        loginController = new LoginController();
         initUI();
     }
 
@@ -126,15 +128,9 @@ public class LoginView extends JFrame {
             return;
         }
 
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
+        boolean loginSuccess = loginController.checkLoginSuccess(username, password); // Gọi phương thức authenticate từ LoginController
+        if (loginSuccess) {
+            JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
                 Player player = new Player(username, password);
                 dispose();
                 
@@ -146,12 +142,8 @@ public class LoginView extends JFrame {
                     new HomeView(gameSession).setVisible(true);
                 }
             });
-            } else {
-                JOptionPane.showMessageDialog(this, "Tên đăng nhập hoặc mật khẩu không đúng!");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Đăng nhập thất bại! Vui lòng thử lại.");
+        } else {
+            JOptionPane.showMessageDialog(this, "Tên đăng nhập hoặc mật khẩu không đúng!");
         }
     }
 

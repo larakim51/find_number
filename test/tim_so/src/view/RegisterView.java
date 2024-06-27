@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
+import controller.RegisterController;
 
 public class RegisterView extends JFrame {
     private JTextField usernameField;
@@ -19,11 +20,13 @@ public class RegisterView extends JFrame {
     private JButton registerButton;
     private JButton loginButton;
     private CompletableFuture<Player> registrationFuture;
+    private RegisterController registerController;
 
     public RegisterView() {
         setUndecorated(true);
         setSize(550, 350); 
         setLocationRelativeTo(null);
+        registerController = new RegisterController();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initUI();
     }
@@ -142,25 +145,15 @@ public class RegisterView extends JFrame {
             return;
         }
 
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, username);
-            stmt.setString(2, email);  // Thêm giá trị email vào câu truy vấn
-            stmt.setString(3, password);
+        boolean registerSuccess = registerController.register(username, email, password);
 
-            int rowsInserted = stmt.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
-                dispose();
-                new LoginView().setVisible(true);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (registerSuccess) {
+            JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
+            dispose();
+            new LoginView().setVisible(true);
+        } else {
             JOptionPane.showMessageDialog(this, "Đăng ký thất bại! Vui lòng thử lại.");
-            if (registrationFuture != null) {
-                registrationFuture.complete(null);
-            }
+            // Xử lý lỗi chi tiết hơn nếu cần (kiểm tra username trùng, lỗi kết nối database, ...)
         }
     }
     
