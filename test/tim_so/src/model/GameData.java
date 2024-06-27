@@ -2,7 +2,9 @@ package  model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameData {
     private int id;
@@ -13,13 +15,12 @@ public class GameData {
     private int gameDuration;
     private int luckyNumber;
     private int luckyNumberBonus = 5; 
-    private List<MultiSession> players;
+    private Map<Player, PlayerSession> playerSessions = new HashMap<>();
     private int currentNumber;
-    private int currentPlayerIndex;
+    private int currentPlayerIndex = 0;
 
-    public GameData(int gameSessionId) {
-        // Lấy thông tin từ cơ sở dữ liệu dựa trên gameSessionId
-        this.id = gameSessionId;
+    public GameData(int roomId, int gameDuration) {
+        this.id = roomId;
         this.startTime = LocalDateTime.now();
         this.numbersToFind = new ArrayList<>();
         for (int i = 1; i <= 100; i++) {
@@ -27,19 +28,36 @@ public class GameData {
         }
         Collections.shuffle(numbersToFind); 
         this.currentNumber = numbersToFind.remove(0); 
+        this.gameDuration = gameDuration;
+        this.endTime = startTime.plusSeconds(gameDuration);
     }
 
     public void start() {
         // Khởi tạo các PlayerSession từ database
     }
+    public void addPlayerSession(Player player, String color) {
+        PlayerSession playerSession = new PlayerSession(player, this, color);
+        playerSessions.put(player, playerSession);
+    }
+    public void setPlayers(Map<Player, String> playerColors) {
+        this.playerSessions = new HashMap<>();
+        for (Map.Entry<Player, String> entry : playerColors.entrySet()) {
+            Player player = entry.getKey();
+            String color = entry.getValue();
+            PlayerSession playerSession = new PlayerSession(player, this, color);
+            this.playerSessions.put(player, playerSession);
+        }
+        this.numPlayers = playerSessions.size();
+        this.luckyNumber = numbersToFind.get((int) (Math.random() * 100));
+    }
 
-    public boolean checkNumber(MultiSession player, int number) {
+    public boolean checkNumber(PlayerSession playerSession, int number) { // Sử dụng PlayerSession
         if (number == currentNumber) {
-            player.getFoundNumbers().add(number);
+            playerSession.getFoundNumbers().add(number);
             if (number == luckyNumber) {
-                player.updateScore(luckyNumberBonus);
+                playerSession.updateScore(luckyNumberBonus);
             }
-            player.updateScore(1);
+            playerSession.updateScore(1);
 
             if (numbersToFind.isEmpty()) {
                 end();
@@ -52,7 +70,9 @@ public class GameData {
             return false; 
         }
     }
-
+    public boolean isGameOver() {
+        return numbersToFind.isEmpty() || LocalDateTime.now().isAfter(endTime); // Kiểm tra hết số hoặc hết giờ
+    }
     public void nextTurn() {
         currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
     }
@@ -96,8 +116,8 @@ public class GameData {
         return luckyNumberBonus;
     }
 
-    public List<MultiSession> getPlayers() {
-        return players;
+    public Map<Player, PlayerSession> getPlayers() {
+        return playerSessions;
     }
 
     public int getCurrentNumber() {
@@ -108,9 +128,14 @@ public class GameData {
         return currentPlayerIndex;
     }
 
+
     // ... (Thêm các setters nếu cần)
 
-    public MultiSession getCurrentPlayer() {
-        return players.get(currentPlayerIndex);
+    public PlayerSession getCurrentPlayer() {
+        return (PlayerSession) playerSessions.values().toArray()[currentPlayerIndex];
+    }
+
+    public void addPlayerSession(Player player, PlayerSession ps){
+        playerSessions.put(player, ps);
     }
 }

@@ -183,11 +183,7 @@ public class MultiPlayerView extends JFrame {
                 }
             }
     
-            if (gameSession.getNumbers().isEmpty()) {
-                showGameOverMessage("Congratulations! You've found all the numbers.");
-            } else {
-                updateNextNumber(getRandomNumber());
-            }
+            
         } else {
             highlightNumber(number, Color.RED);
             resetNumber(currentNumber); 

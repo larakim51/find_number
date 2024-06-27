@@ -9,7 +9,7 @@ public class Player {
     private int wins;          
     private int losses;        
     private int totalGames;
-
+    private GameSession currentGame;
 
     public Player(String username, String password, int score, String email, int ranking, int wins, int losses, int totalGames) {
         this.username = username;
@@ -29,6 +29,14 @@ public class Player {
     }
 
     // Getters và Setters
+    public GameSession getCurrentGame() {
+        return currentGame;
+    }
+
+    public void setCurrentGame(GameSession currentGame) {
+        this.currentGame = currentGame;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -92,5 +100,8 @@ public class Player {
     public void setTotalGames(int totalGames) {
         this.totalGames = totalGames;
     }
+    public String getPlayerName(){
+        return username;
+        }
     // Các phương thức khác nếu cần
 }

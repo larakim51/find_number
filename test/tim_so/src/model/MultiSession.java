@@ -1,52 +1,24 @@
 package model;
-import java.util.ArrayList;
-import java.util.List;
-import model.Player;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class MultiSession {
-    private Player player; // Sử dụng Player thay vì User
-    private GameData game;
-    private String color;
-    private List<Integer> foundNumbers;
-    private int score;
-
-    public MultiSession(Player player, GameData game, String color) {
-        this.player = player;
-        this.game = game;
-        this.color = color;
-        this.foundNumbers = new ArrayList<>();
-        this.score = 0;
+    
+    private Map<Integer, GameSession> gameSessions = new HashMap<>();
+    
+    public synchronized int createGame(Player player, int gameDuration) {
+        int roomId = generateRoomId(); // Đảm bảo generateRoomId trả về int
+        GameData gameData = new GameData(roomId, gameDuration);
+        GameSession gameSession = new GameSession(roomId, gameData);
+        gameSession.addPlayer(player);
+        gameSessions.put(roomId, gameSession);
+        return roomId;
     }
 
-    public void findNumber(int number) {
-        if (game.checkNumber(this, number)) {
-            // Xử lý khi tìm đúng số (ví dụ: gửi thông báo đến client)
-        }
-    }
 
-    public void updateScore(int points) {
-        this.score += points;
-    }
-
-    // Getters và setters
-
-    public Player getPlayer() { 
-        return player; 
-    }
-
-    public GameData getGame() {
-        return game;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public List<Integer> getFoundNumbers() {
-        return foundNumbers;
-    }
-
-    public int getScore() {
-        return score;
+    private int generateRoomId() {
+        Random random = new Random();
+        return random.nextInt(10000); 
     }
 }

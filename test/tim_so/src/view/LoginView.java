@@ -2,6 +2,7 @@ package view;
 
 import database.DatabaseConnection;
 import model.GameSession;
+import model.MultiSession;
 import model.Player;
 
 import javax.swing.*;
@@ -22,6 +23,7 @@ public class LoginView extends JFrame {
     private JButton registerButton;
     private CompletableFuture<Player> registrationFuture;
     private LoginController loginController;
+    
 
     public LoginView() {
         setUndecorated(true); 
@@ -118,7 +120,10 @@ public class LoginView extends JFrame {
         });
     }
 
-    private boolean checkLoginSuccess = false; 
+    private boolean checkLoginSuccess = false;
+    private MultiSession multiSession = new MultiSession();
+    private int gameDuration = 300;
+
     private void loginUser() {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
@@ -131,16 +136,13 @@ public class LoginView extends JFrame {
         boolean loginSuccess = loginController.checkLoginSuccess(username, password); // Gọi phương thức authenticate từ LoginController
         if (loginSuccess) {
             JOptionPane.showMessageDialog(this, "Đăng nhập thành công!");
-                Player player = new Player(username, password);
-                dispose();
-                
-                SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    GameSession gameSession = new GameSession();
-                    gameSession.addPlayer(player);
-                    new HomeView(gameSession).setVisible(true);
-                }
+            Player player = new Player(username, password);
+            dispose();
+
+            SwingUtilities.invokeLater(() -> {
+                GameSession gameSession = multiSession.createGame(player, gameDuration); // Tạo game mới
+                gameSession.addPlayer(player); // Thêm người chơi vào game vừa tạo
+                new HomeView(player, gameSession).setVisible(true); // Truyền player vào HomeView
             });
         } else {
             JOptionPane.showMessageDialog(this, "Tên đăng nhập hoặc mật khẩu không đúng!");
