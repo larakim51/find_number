@@ -12,6 +12,7 @@ public class HomeView extends JFrame {
     private GameSession gameSession;
     private static HomeView instance;
     private Player player;
+    
 
     public HomeView(Player player, GameSession gameSession) {
         this.player = player; 
@@ -91,7 +92,7 @@ public class HomeView extends JFrame {
     private void startSinglePlayerGame() {
         // Khởi động chế độ chơi 1 người
         dispose();
-        new GameView(player).setVisible(true);
+        new GameView(player,this,gameSession).setVisible(true);
     }
 
     private void startMultiPlayerGame() {
@@ -106,12 +107,8 @@ public class HomeView extends JFrame {
     }
 
     public static void main(String[] args) {
-        GameSession gameSession = multiSession.createGame(player, gameDuration);
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new HomeView(gameSession).setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            new LoginView().setVisible(true); // Chỉ hiển thị LoginView khi bắt đầu chương trình
         });
     }
 }

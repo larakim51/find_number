@@ -7,7 +7,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.util.Random;
+import java.util.Observable;
+import java.util.Observer;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -19,12 +20,11 @@ import javax.swing.border.EmptyBorder;
 import model.GameSession;
 import model.Player;
 
-public class GameView extends JFrame {
+public class GameView extends JFrame implements Observer  {
     private GameSession gameSession;
     private JButton[] numberButtons;
     private JLabel numberLabel;
     private JLabel scoreLabel;
-    private int currentNumber;
     private HomeView homeView;
     private Player player;
 
@@ -38,12 +38,21 @@ public class GameView extends JFrame {
         initUI();
         setVisible(true);
     }
-    public GameView(Player player) {
+    public GameView(Player player,HomeView homeview,GameSession gameSession) {
+        this.homeView = homeview;
+        this.gameSession = gameSession;
         this.player = player;
-        // ... (khởi tạo các thành phần khác của giao diện)
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null);
+        this.initUI();
+        this.setVisible(true);
+    }
+    public Player getPlayer() {
+        return player;
     }
 
     private void initUI() {
+
         Font boldFont = new Font(Font.SANS_SERIF, Font.BOLD, 14);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -86,7 +95,7 @@ public class GameView extends JFrame {
             numberButtons[i].addActionListener(e -> handleNumberClick(Integer.parseInt(((JButton) e.getSource()).getText())));
             buttonPanel.add(numberButtons[i]);
         }
-    
+        
         // Top panel (hiển thị số và điểm)
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Sử dụng FlowLayout để căn giữa
         // Label cho chữ "Find:"
@@ -94,8 +103,9 @@ public class GameView extends JFrame {
         findLabel.setBorder(new EmptyBorder(10, 20, 10, 0));  // Thêm khoảng cách với numberLabel
         topPanel.add(findLabel, BorderLayout.WEST);
         // Number label (hiển thị số)
-        numberLabel = new JLabel(String.valueOf(getRandomNumber()), JLabel.CENTER); // Gộp chuỗi
-        numberLabel.setBorder(new EmptyBorder(10, 10, 10, 20)); // Thêm padding xung quanh
+        numberLabel = new JLabel();
+        int currentNumber = gameSession.getGameData().getCurrentNumber();
+        numberLabel.setText(String.valueOf(currentNumber));
         topPanel.add(numberLabel); 
         // Score label (hiển thị điểm)
         scoreLabel = new JLabel("Score: 0");
@@ -122,16 +132,9 @@ public class GameView extends JFrame {
         });
     }
     
-
-    private int getRandomNumber() {
-        Random random = new Random();
-        currentNumber = random.nextInt(100) + 1;
-        return currentNumber;
-    }
-
     private void handleNumberClick(int number) {
-
-        if (number == currentNumber) {
+        Player currentPlayer = gameSession.getPlayers().get(0);
+        if (gameSession != null && !gameSession.getPlayers().isEmpty() && gameSession.checkNumber(currentPlayer, number)) {
             new Thread(() -> {
                 try {
                     for (int i = 0; i < 5; i++) { // Nhấp nháy 5 lần
@@ -144,21 +147,21 @@ public class GameView extends JFrame {
                     e.printStackTrace();
                 }
             }).start();
+            currentPlayer.setScore(currentPlayer.getScore() + 1);
+            updatePlayerScore(currentPlayer);
 
-            gameSession.getPlayers().get(0).setScore(gameSession.getPlayers().get(0).getScore() + 1);
-            updatePlayerScore(gameSession.getPlayers().get(0));
-            resetNumber(number); 
-    
-            // Reset tất cả các nút đã chọn sai trước đó
+            int newCurrentNumber = gameSession.getGameData().getCurrentNumber();
+            updateNextNumber(newCurrentNumber); 
+
+            // Reset tất cả các nút đã chọn sai trước đó và số hiện tại
             for (int i = 0; i < numberButtons.length; i++) {
-                if (i != number - 1 && numberButtons[i].getBackground() == Color.RED) {
-                    resetNumber(i + 1); // Reset màu của nút
+                if (numberButtons[i].getBackground() == Color.RED || i == newCurrentNumber - 1) {
+                    resetNumber(i + 1);
                 }
             }
-    
-        } else {
+
+        } else{ 
             highlightNumber(number, Color.RED);
-            resetNumber(currentNumber); 
         }
     }
 
@@ -204,5 +207,10 @@ public class GameView extends JFrame {
             System.err.println("Lỗi: homeView chưa được khởi tạo!");
             // Xử lý lỗi ở đây, ví dụ: hiển thị thông báo lỗi hoặc thoát chương trình
         }
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

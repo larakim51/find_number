@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import view.GameView;
 
-public class GameSession {
+public class GameSession extends Observable{
     private int id;
     private List<Player> players;
     private GameData gameData;
@@ -15,12 +17,22 @@ public class GameSession {
     private Map<Player, String> playerColors = new HashMap<>(); // Lưu trữ màu sắc của mỗi người chơi
     private int currentColorIndex = 0; // Theo dõi màu sắc tiếp theo cần gán
     private final List<String> availableColors = List.of("red", "blue", "green"); // Danh sách màu có thể chọn
+    private List<GameView> observers = new ArrayList<>();
 
     public GameSession(int id, GameData gameData) {
         this.id = id;
         this.players = new ArrayList<>();
         this.gameData = gameData;
         this.started = false;
+    }
+    public void addObserver(GameView observer) {
+        observers.add(observer);
+    }
+
+    private void notifyObservers(Player player, int number, boolean found) {
+        for (GameView observer : observers) {
+            observer.update(player, number, found);
+        }
     }
 
     private String assignColor() {
@@ -55,9 +67,25 @@ public class GameSession {
     }
 
     public boolean checkNumber(Player player, int number) {
-        PlayerSession playerSession = gameData.getPlayers().get(player); // Lấy PlayerSession từ gameData
-        if (playerSession != null && gameData.checkNumber(playerSession, number)) {
-            // ... (xử lý khi tìm đúng số)
+        PlayerSession playerSession = gameData.getPlayers().get(player);
+        if (playerSession != null) {
+            boolean isCorrect = gameData.checkNumber(playerSession, number);
+
+            if (isCorrect) {
+                setChanged(); // Đánh dấu trạng thái đã thay đổi
+                notifyObservers(new int[]{number, playerSession.getScore()}); // Thông báo kết quả
+            } else {
+                setChanged();
+                notifyObservers(new int[]{number, -1});
+            }
+
+            if (gameData.isGameOver()) {
+                endGame();
+                setChanged();
+                notifyObservers("GAME_OVER"); // Thông báo kết thúc game
+            }
+
+            return isCorrect;
         }
         return false;
     }

@@ -34,26 +34,17 @@ public class GameController {
     }
 
     private void handleNumberClick(int number) {
-        List<Integer> numbers = model.getNumbers();
-        
-        if (numbers.contains(number)) {
-            model.getNumbers().remove((Integer) number);
+        if (model.checkNumber(view.getPlayer(), number)) { // Sử dụng view.getPlayer() để lấy Player hiện tại
             view.highlightNumber(number, Color.GREEN);
-        
-            // Cập nhật điểm số của người chơi
-            Player currentPlayer = model.getPlayers().get(0);
-            currentPlayer.setScore(currentPlayer.getScore() + 1);
-            view.updatePlayerScore(currentPlayer);
-        
+            view.updatePlayerScore(view.getPlayer()); // Cập nhật điểm số người chơi hiện tại
+
             // Kiểm tra kết thúc trò chơi
-            if (model.getNumbers().isEmpty()) {
+            if (model.isGameOver()) {
                 view.showGameOverMessage("Congratulations! You've found all the numbers.");
                 // Thực hiện các logic kết thúc trò chơi khác
             }
         } else {
             view.highlightNumber(number, Color.RED);
-            // Có thể thêm logic để thông báo cho người chơi biết số đó không đúng
         }
-        
     }
 }

@@ -18,8 +18,10 @@ public class GameData {
     private Map<Player, PlayerSession> playerSessions = new HashMap<>();
     private int currentNumber;
     private int currentPlayerIndex = 0;
+    private boolean gameOver;
 
     public GameData(int roomId, int gameDuration) {
+        this.gameOver = false;
         this.id = roomId;
         this.startTime = LocalDateTime.now();
         this.numbersToFind = new ArrayList<>();
@@ -51,13 +53,13 @@ public class GameData {
         this.luckyNumber = numbersToFind.get((int) (Math.random() * 100));
     }
 
-    public boolean checkNumber(PlayerSession playerSession, int number) { // Sử dụng PlayerSession
+    public boolean checkNumber(Player player, int number) { // Sử dụng PlayerSession
         if (number == currentNumber) {
-            playerSession.getFoundNumbers().add(number);
+            player.getFoundNumbers().add(number);
             if (number == luckyNumber) {
-                playerSession.updateScore(luckyNumberBonus);
+                player.updateScore(luckyNumberBonus);
             }
-            playerSession.updateScore(1);
+            player.updateScore(1);
 
             if (numbersToFind.isEmpty()) {
                 end();
@@ -78,6 +80,7 @@ public class GameData {
     }
 
     public void end() {
+        gameOver = true;
         endTime = LocalDateTime.now();
         // Cập nhật kết quả vào database
     }
