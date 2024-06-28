@@ -1,5 +1,7 @@
 package model;
 
+import java.io.PrintWriter;
+
 public class Player {
     private String username;
     private String password; // Mật khẩu cần được mã hóa khi lưu trữ
@@ -9,32 +11,34 @@ public class Player {
     private int wins;          
     private int losses;        
     private int totalGames;
-    private GameSession currentGame;
+    private String color;
+    private PrintWriter out;
 
     public Player(String username, String password, int score, String email, int ranking, int wins, int losses, int totalGames) {
         this.username = username;
         this.password = password; // Lưu ý: Cần mã hóa mật khẩu trước khi lưu trữ
-        this.score = score;
+        this.score = 0;
         this.email = email;
         this.ranking = ranking;
         this.wins = wins;
         this.losses = losses;
         this.totalGames = totalGames;
+        this.out = out;
     }
 
     public Player(String username, String password) {
         this.username = username;
-        this.password = password; // Bạn cần mã hóa mật khẩu trước khi lưu
+        this.password = password; 
         this.score = 0;
     }
-
-    // Getters và Setters
-    public GameSession getCurrentGame() {
-        return currentGame;
+    public Player(String username, PrintWriter out) {
+        this.username = username;
+        this.out = out;
+        this.score = 0;
     }
-
-    public void setCurrentGame(GameSession currentGame) {
-        this.currentGame = currentGame;
+    public Player(String username) {
+        this.username = username;
+        this.score = 0; // Initialize score to 0
     }
 
     public String getUsername() {
@@ -103,5 +107,17 @@ public class Player {
     public String getPlayerName(){
         return username;
         }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public void sendMessage(String message) {
+        out.println(message);
+    }
     // Các phương thức khác nếu cần
 }

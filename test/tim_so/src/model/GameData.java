@@ -38,43 +38,6 @@ public class GameData extends Observable{
     public void start() {
         // Khởi tạo các PlayerSession từ database
     }
-    public void addPlayerSession(Player player, String color) {
-        MultiSession playerSession = new MultiSession(player, this, color);
-        playerSessions.put(player, playerSession);
-    }
-    public void setPlayers(Map<Player, String> playerColors) {
-        this.playerSessions = new HashMap<>();
-        for (Map.Entry<Player, String> entry : playerColors.entrySet()) {
-            Player player = entry.getKey();
-            String color = entry.getValue();
-            MultiSession playerSession = new MultiSession(player, this, color);
-            this.playerSessions.put(player, playerSession);
-        }
-        this.numPlayers = playerSessions.size();
-        this.luckyNumber = numbersToFind.get((int) (Math.random() * 100));
-    }
-
-    public boolean checkNumber(MultiSession playerSession, int number) {
-        if (number == currentNumber) {
-            playerSession.getFoundNumbers().add(number);
-            if (number == luckyNumber) {
-                playerSession.updateScore(luckyNumberBonus);
-            }
-            playerSession.updateScore(1);
-
-            if (numbersToFind.isEmpty()) {
-                endGame();
-            } else {
-                currentNumber = numbersToFind.remove(0);
-                nextTurn();
-                setChanged();
-                notifyObservers(currentNumber); // Thông báo số mới cho GameView
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public boolean isGameOver() {
         return numbersToFind.isEmpty() || LocalDateTime.now().isAfter(endTime); // Kiểm tra hết số hoặc hết giờ

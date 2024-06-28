@@ -1,6 +1,8 @@
 package view;
 
 import model.GameSession;
+import model.MultiSession;
+import model.Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,8 +12,15 @@ import java.awt.event.ActionListener;
 public class HomeView extends JFrame {
     private GameSession gameSession;
     private static HomeView instance;
+    private Player currentPlayer;
 
-    public HomeView(GameSession gameSession) {
+    public HomeView(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
+        initUI();
+    }
+
+    public HomeView(GameSession gameSession, Player player) {
+        this.currentPlayer = player;
         this.gameSession = gameSession;
         instance = this; // Gán instance khi khởi tạo HomeView
         setUndecorated(true); 
@@ -94,7 +103,24 @@ public class HomeView extends JFrame {
     private void startMultiPlayerGame() {
         // Khởi động chế độ chơi nhiều người
         dispose();
-        new MultiPlayerView(this,gameSession).setVisible(true);
+        MultiSession multiSession = new MultiSession(new MultiSession.MultiSessionListener() {
+            @Override
+            public void onTimeUpdate(String time) {
+                // TODO: Implement this method in MultiPlayerView
+            }
+
+            @Override
+            public void onGameEnd() {
+                // TODO: Implement this method in MultiPlayerView
+            }
+
+            @Override
+            public void onNumberUpdate(int number) {
+                // TODO: Implement this method in MultiPlayerView
+            }
+        });
+        multiSession.addPlayer(currentPlayer); // Adding the current player to the session
+        new MultiPlayerView(currentPlayer, multiSession).setVisible(true);
     }
 
     private void showLeaderboard() {
@@ -104,11 +130,11 @@ public class HomeView extends JFrame {
 
     public static void main(String[] args) {
         GameSession gameSession = new GameSession();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new HomeView(gameSession).setVisible(true);
-            }
-        });
+        Player player = new Player("testPlayer");
+
+        HomeView homeView = new HomeView(gameSession, player);
+        homeView.setSize(800, 600);
+        homeView.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        homeView.setVisible(true);
     }
 }

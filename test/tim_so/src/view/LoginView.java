@@ -141,7 +141,8 @@ public class LoginView extends JFrame {
                 public void run() {
                     GameSession gameSession = new GameSession();
                     gameSession.addPlayer(player);
-                    new HomeView(gameSession).setVisible(true);
+                    new HomeView(gameSession, player).setVisible(true);
+                    dispose();
                 }
             });
         } else {
