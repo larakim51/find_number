@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.util.List;
 import java.util.Random;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -119,10 +120,18 @@ public class GameView extends JFrame {
     
 
     private int getRandomNumber() {
-        Random random = new Random();
-        currentNumber = random.nextInt(100) + 1;
-        return currentNumber;
+        List<Integer> numbersToSend = gameSession.getNumbersToSend();
+        if (!numbersToSend.isEmpty()) {
+            Random random = new Random();
+            int index = random.nextInt(numbersToSend.size());
+            currentNumber = numbersToSend.get(index);
+            numbersToSend.remove(index); // Loại bỏ số đã lấy ra
+            return currentNumber;
+        } else {
+            return -1; // Hoặc xử lý trường hợp hết số
+        }
     }
+    
 
     private void handleNumberClick(int number) {
 

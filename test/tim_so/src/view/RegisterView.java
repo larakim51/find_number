@@ -145,16 +145,21 @@ public class RegisterView extends JFrame {
             return;
         }
 
-        boolean registerSuccess = registerController.register(username, email, password);
+        registerController.handleRegisterAction(username, email, password, this::onRegisterSuccess, this::onRegisterFailure);
+    }
 
-        if (registerSuccess) {
+    private void onRegisterSuccess() {
+        SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
             dispose();
             new LoginView().setVisible(true);
-        } else {
+        });
+    }
+
+    private void onRegisterFailure() {
+        SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this, "Đăng ký thất bại! Vui lòng thử lại.");
-            // Xử lý lỗi chi tiết hơn nếu cần (kiểm tra username trùng, lỗi kết nối database, ...)
-        }
+        });
     }
     
         public Player waitForRegistration() {
@@ -166,7 +171,7 @@ public class RegisterView extends JFrame {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    new RegisterView().setVisible(true);
+                    SwingUtilities.invokeLater(() -> new RegisterView().setVisible(true));
                 }
             });
         }

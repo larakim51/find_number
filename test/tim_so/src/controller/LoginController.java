@@ -5,8 +5,31 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import network.GameClient;
 
 public class LoginController {
+    private GameClient client;
+
+    public LoginController() {
+        this.client = GameClient.getInstance(); // Đảm bảo rằng GameClient đã được khởi tạo trước đó
+    }
+
+
+    public void handleLoginAction(String username, String password, Runnable onSuccess, Runnable onFailure) {
+        boolean loginSuccess = checkLoginSuccess(username, password);
+        if (loginSuccess) {
+            try {
+                client.sendMessage("LOGIN_SUCCESS:" + username);
+                onSuccess.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            onFailure.run();
+        }
+    }
+
+    
     public boolean checkLoginSuccess(String username, String password) {
         try (Connection conn = DatabaseConnection.getConnection()) {
             String sql = "SELECT * FROM usersAcc WHERE username = ? AND password = ?";

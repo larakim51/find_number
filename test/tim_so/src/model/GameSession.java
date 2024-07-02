@@ -6,17 +6,31 @@ import java.util.List;
 
 public class GameSession {
     private List<Player> players;
-    private List<Integer> numbers; // Danh sách chứa các số từ 1 đến 100
-
+    private List<Integer> numbers; 
+    
+    private static final int MAX_NUMBERS_TO_SEND = 3; // Giới hạn số lượng số gửi
+    private static final int NUMBERS_PER_LIST = 100;
     public GameSession() {
         this.players = new ArrayList<>();
         this.numbers = new ArrayList<>();
-        for (int i = 1; i <= 100; i++) {
+        for (int i=1 ; i <= NUMBERS_PER_LIST ; i++){
             this.numbers.add(i);
         }
-        Collections.shuffle(this.numbers); // Trộn các số
+    }
+    public List<Integer> getNumbersToSend() {
+        List<Integer> allNumbers = new ArrayList<>();
+        for (int i = 1; i <= NUMBERS_PER_LIST; i++) {
+            allNumbers.add(i);
+        }
+        Collections.shuffle(allNumbers);
+
+     
+        return allNumbers.subList(0, Math.min(MAX_NUMBERS_TO_SEND, allNumbers.size()));
     }
 
+    public boolean isGameOver() {
+        return numbers.isEmpty(); 
+    }
     // Getters và Setters
     public List<Player> getPlayers() {
         return players;

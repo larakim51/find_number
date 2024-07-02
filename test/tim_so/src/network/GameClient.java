@@ -1,94 +1,82 @@
 package network;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class GameClient {
     private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
-    private Scanner scanner;
-    private String username;
-    private String roomId;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+    private static GameClient instance;
 
-    public GameClient(String serverAddress, int serverPort, String username) throws IOException {
+    public GameClient(String serverAddress, int serverPort) throws IOException {
         socket = new Socket(serverAddress, serverPort);
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out = new PrintWriter(socket.getOutputStream(), true);
-        this.username = username;
-        this.roomId = generateRoomId();
-        scanner = new Scanner(System.in);
+        out = new ObjectOutputStream(socket.getOutputStream());
+        in = new ObjectInputStream(socket.getInputStream());
+        instance = this;
     }
 
-    private String generateRoomId() {
-        // Tạo Room ID tự động, bạn có thể tùy chỉnh logic này
-        return "Room-" + System.currentTimeMillis();
+    public static GameClient getInstance() {
+        return instance;
     }
 
-    public void connect() {
+    public void sendMessage(String message) {
         try {
-            System.out.println("Connected to server");
-
-            // Gửi thông tin người chơi đến server
-            out.println(username);
-            out.println(roomId);
-
-            // Lắng nghe thông báo từ server
-            String serverMessage;
-            while ((serverMessage = in.readLine()) != null) {
-                System.out.println("Server: " + serverMessage);
-                if (serverMessage.equals("Game is starting")) {
-                    // Bắt đầu xử lý trò chơi
-                    playGame();
-                }
-            }
+            out.writeObject(message);
+            out.flush();  // Ensure message is sent immediately
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void playGame() {
+    public void startApplication() {
         try {
-            // Đây là nơi bạn sẽ thêm logic để chơi trò chơi
-            // Ví dụ: đọc và gửi điểm về server
-            while (true) {
-                System.out.print("Enter the number you found: ");
-                String number = scanner.nextLine();
-                out.println("NUMBER:" + number);
+            String command = (String) in.readObject();
+            if ("START_APPLICATION".equals(command)) {
+                executeMainMethod("test.Main");
 
-                System.out.print("Enter your score: ");
-                String score = scanner.nextLine();
-                out.println("SCORE:" + score);
+                while (true) {
+                    // Do something or keep the connection alive
+                }
             }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void executeMainMethod(String className) {
+        try {
+            Class<?> cls = Class.forName(className);
+            Method mainMethod = cls.getMethod("main", String[].class);
+            String[] params = {}; // init params array
+            mainMethod.invoke(null, (Object) params); // static method doesn't belong to any instance
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    public void sendScore(int score) {
-        out.println("SCORE:" + score);
+
+    public void closeConnection() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter server address: ");
+        System.out.print("Enter server IP address: ");
         String serverAddress = scanner.nextLine();
 
-        if (!serverAddress.equals("10.0.5.1")) {
-            System.out.println("Invalid server address. Please enter 10.0.5.1.");
-            return;
-        }
-
-        System.out.print("Enter your username: ");
-        String username = scanner.nextLine();
+        System.out.print("Enter server port: ");
+        int serverPort = scanner.nextInt();
 
         try {
-            GameClient client = new GameClient(serverAddress, 12345, username);
-            client.connect();
+            GameClient client = new GameClient(serverAddress, serverPort);
+            client.startApplication();
         } catch (IOException e) {
             e.printStackTrace();
         }

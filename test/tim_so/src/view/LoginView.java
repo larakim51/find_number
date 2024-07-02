@@ -104,12 +104,31 @@ public class LoginView extends JFrame {
                 new RegisterView().setVisible(true);
             }
         });
-        loginButton.addActionListener(e -> {
-            loginUser();
-            if (!checkLoginSuccess) { // Sử dụng biến checkLoginSuccess
-                errorLabel.setVisible(true);
-            } else {
-                errorLabel.setVisible(false);
+
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = usernameField.getText();
+                String password = new String(passwordField.getPassword());
+                loginController.handleLoginAction(username, password, () -> {
+                    // Xử lý khi đăng nhập thành công
+                    JOptionPane.showMessageDialog(LoginView.this, "Login successful!");
+                    Player player = new Player(username, password);
+                    dispose();
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                    GameSession gameSession = new GameSession();
+                    gameSession.addPlayer(player);
+                    new HomeView(gameSession, player).setVisible(true);
+                    dispose();
+                }
+            });
+                }, () -> {
+                    // Xử lý khi đăng nhập thất bại
+                    JOptionPane.showMessageDialog(LoginView.this, "Login failed!");
+                });
             }
         });
 

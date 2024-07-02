@@ -20,6 +20,7 @@ public class GameData extends Observable{
     private int currentNumber;
     private int currentPlayerIndex = 0;
     private boolean gameOver;
+    
 
     public GameData(int roomId, int gameDuration) {
         this.gameOver = false;

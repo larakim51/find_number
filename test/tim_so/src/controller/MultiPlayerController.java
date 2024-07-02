@@ -1,6 +1,9 @@
 package controller;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import javax.swing.JOptionPane;
 import model.MultiSession;
 import model.Player;
@@ -13,7 +16,26 @@ public class MultiPlayerController {
     private MultiPlayerView view;
     private GameClient client;
     private int currentNumber;
+    private Socket socket;
+    private ObjectOutputStream out;
+
+    public MultiPlayerController() {
+        try {
+            socket = new Socket("localhost", 12345);
+            out = new ObjectOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
+    public void finishMultiPlayerGame(String username, int score) {
+        try {
+            GameClient client = GameClient.getInstance();
+            client.sendMessage("FINISH_MULTIPLAYER_GAME:" + username + ";" + score);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public MultiPlayerController(MultiSession multiSession, MultiPlayerView view) {
         this.multiSession = multiSession;
